@@ -1,0 +1,65 @@
+add_library(xil_bsp_standalone_arm_common STATIC EXCLUDE_FROM_ALL)
+add_library(xil::bsp::standalone_arm_common ALIAS xil_bsp_standalone_arm_common)
+
+target_sources(xil_bsp_standalone_arm_common
+  PRIVATE
+    $<$<C_COMPILER_ID:ARMClang>:
+      armclang/_sys_close.c
+      armclang/_sys_exit.c
+      armclang/_sys_iserror.c
+      armclang/_sys_istty.c
+      armclang/_sys_open.c
+      armclang/_sys_read.c
+      armclang/_sys_time.c
+      armclang/_sys_write.c>
+    $<$<C_COMPILER_ID:GNU>:
+      gcc/_exit.c
+      gcc/_open.c
+      gcc/_sbrk.c
+      gcc/abort.c
+      gcc/close.c
+      gcc/cpputest_time.c
+      gcc/errno.c
+      gcc/fcntl.c
+      gcc/fstat.c
+      gcc/getpid.c
+      gcc/isatty.c
+      gcc/kill.c
+      gcc/lseek.c
+      gcc/open.c
+      gcc/read.c
+      gcc/sbrk.c
+      gcc/time.c
+      gcc/unlink.c
+      gcc/write.c
+      gcc/xpseudo_asm_gcc.h>
+    $<$<C_COMPILER_ID:IAR>:
+      iccarm/abort.c
+      iccarm/clock.c
+      iccarm/close.c
+      iccarm/exit.c
+      iccarm/low_level_init.c
+      iccarm/lseek.c
+      iccarm/open.c
+      iccarm/read.c
+      iccarm/remove.c
+      iccarm/write.c
+      iccarm/xpseudo_asm_iccarm.c
+      iccarm/xpseudo_asm_iccarm.h>
+    putnum.c
+    vectors.c
+    vectors.h
+    xil_exception.c
+    xil_exception.h
+    xil_sleeptimer.c
+    xil_sleeptimer.h
+    xil_spinlock.c
+    xil_spinlock.h
+)
+
+target_include_directories( xil_bsp_standalone_arm_common SYSTEM
+  PUBLIC
+   .
+   $<$<C_COMPILER_ID:GNU>:gcc>
+   $<$<C_COMPILER_ID:IAR>:iccarm>
+)

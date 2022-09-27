@@ -1,0 +1,15 @@
+add_subdirectory(arm)
+add_subdirectory(common)
+add_subdirectory(microblaze)
+add_subdirectory(profile)
+
+# TODO(phelter): Figure out how to build multiple at a time
+if(XIL_PROCESSOR STREQUAL ARMV8)
+  add_library(xil::bsp ALIAS xil::bsp::standalone_armv8_64bit)
+elseif(XIL_PROCESSOR STREQUAL CORTEXA9)
+  add_library(xil::bsp ALIAS xil::bsp::standalone_cortexa9)
+elseif(XIL_PROCESSOR STREQUAL CORTEXR5)
+  add_library(xil::bsp ALIAS xil::bsp::standalone_cortexr5)
+elseif(XIL_PROCESSOR STREQUAL MICROBLAZE)
+  add_library(xil::bsp ALIAS xil::bsp::standalone_microblaze)
+endif()
