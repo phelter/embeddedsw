@@ -20,14 +20,14 @@ target_sources(xil_bsp_standalone_armv8_64bit
     armclang/asm_vectors.S
     armclang/boot.S
     armclang/xpseudo_asm_armclang.h>
-  $<$<AND:$<IN_LIST:${XIL_PLATFORM}:${XIL_PLATFORM_LIST}>,$<C_COMPILER_ID:ARMClang>>:
+  $<$<AND:$<IN_LIST:${XIL_PLATFORM},${XIL_PLATFORM_LIST}>,$<C_COMPILER_ID:ARMClang>>:
     platform/${XIL_PLATFORM}/armclang/translation_table.S>
   $<$<C_COMPILER_ID:GNU>:
     gcc/asm_vectors.S
     gcc/boot.S
     gcc/initialise_monitor_handles.c
     gcc/xil-crt0.S>
-  $<$<AND:$<IN_LIST:${XIL_PLATFORM}:${XIL_PLATFORM_LIST}>,$<C_COMPILER_ID:ARMClang>>:
+  $<$<AND:$<IN_LIST:${XIL_PLATFORM},${XIL_PLATFORM_LIST}>,$<C_COMPILER_ID:ARMClang>>:
     platform/${XIL_PLATFORM}/gcc/translation_table.S>
     xpvxenconsole/arm64_ops.h
     xpvxenconsole/hypercall.h
@@ -46,13 +46,13 @@ target_include_directories( xil_bsp_standalone_armv8_64bit SYSTEM
    .
    xpvxenconsole
   PRIVATE
-  $<$<IN_LIST:${XIL_PLATFORM}:${XIL_PLATFORM_LIST}:
-    platform/${XIL_PLATFORM}>
+  $<$<IN_LIST:${XIL_PLATFORM},${XIL_PLATFORM_LIST}:
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/${XIL_PLATFORM}>
 )
 
 target_compile_options (xil_bsp_standalone_armv8_64bit
   PRIVATE
-  $<$<C_COMPILER_ID:GNU
+  $<$<C_COMPILER_ID:GNU>:
     -nostartfiles
     -march=armv8-a>
 )

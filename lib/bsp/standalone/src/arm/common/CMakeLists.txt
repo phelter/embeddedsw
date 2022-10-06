@@ -12,14 +12,13 @@ target_sources(xil_bsp_standalone_arm_common
       armclang/_sys_read.c
       armclang/_sys_time.c
       armclang/_sys_write.c>
-    $<$<C_COMPILER_ID:GNU>:
+    $<$<OR:$<BOOL:${CMAKE_CROSSCOMPILING}>,$<C_COMPILER_ID:GNU,Clang>>:
       gcc/_exit.c
       gcc/_open.c
       gcc/_sbrk.c
       gcc/abort.c
       gcc/close.c
       gcc/cpputest_time.c
-      gcc/errno.c
       gcc/fcntl.c
       gcc/fstat.c
       gcc/getpid.c
@@ -33,6 +32,10 @@ target_sources(xil_bsp_standalone_arm_common
       gcc/unlink.c
       gcc/write.c
       gcc/xpseudo_asm_gcc.h>
+    $<$<AND:$<BOOL:${CMAKE_CROSSCOMPILING}>,$<C_COMPILER_ID:GNU,Clang>>:
+        gcc/errno.c>
+      $<$<AND:$<NOT:$<BOOL:${CMAKE_CROSSCOMPILING}>>,$<C_COMPILER_ID:GNU,Clang>>:
+        stubs/errno.c>
     $<$<C_COMPILER_ID:IAR>:
       iccarm/abort.c
       iccarm/clock.c
@@ -59,7 +62,31 @@ target_sources(xil_bsp_standalone_arm_common
 
 target_include_directories( xil_bsp_standalone_arm_common SYSTEM
   PUBLIC
-   .
-   $<$<C_COMPILER_ID:GNU>:gcc>
-   $<$<C_COMPILER_ID:IAR>:iccarm>
+    .
+    #$<$<C_COMPILER_ID:ARMClang>:${CMAKE_CURRENT_SOURCE_DIR}/armclang> # No Headers
+    $<$<C_COMPILER_ID:GNU,Clang>:${CMAKE_CURRENT_SOURCE_DIR}/gcc>
+    $<$<C_COMPILER_ID:IAR>:${CMAKE_CURRENT_SOURCE_DIR}/iccarm>
+)
+
+target_compile_options( xil_bsp_standalone_arm_common
+  PUBLIC
+    $<$<C_COMPILER_ID:ARMClang,Clang>:-Wno-extra-semi-stmt>
+  PRIVATE
+    $<$<C_COMPILER_ID:ARMClang,Clang>:-Wno-extra-semi-stmt>
+    $<$<C_COMPILER_ID:ARMClang,Clang>:-Wno-missing-noreturn>
+    $<$<C_COMPILER_ID:ARMClang,Clang>:-Wno-missing-variable-declarations>
+    $<$<C_COMPILER_ID:ARMClang,Clang>:-Wno-reserved-identifier>
+    $<$<C_COMPILER_ID:ARMClang,Clang>:-Wno-shadow>
+    $<$<C_COMPILER_ID:ARMClang,Clang>:-Wno-undef>
+)
+
+target_link_libraries( xil_bsp_standalone_arm_common
+  PUBLIC
+    xil::config
+  PRIVATE
+    xil::bsp::standalone_common
+    $<$<IN_LIST:${XIL_PLATFORM},${XIL_PLATFORM_ZYNQ_LIST}>:xil::bsp::standalone_arm_cortexa9>
+    $<$<IN_LIST:${XIL_PLATFORM},${XIL_PLATFORM_ZYNQMP_LIST}>:xil::bsp::standalone_armv8_64bit>
+    $<$<IN_LIST:${XIL_PLATFORM},${XIL_PLATFORM_VERSAL_LIST}>:xil::bsp::standalone_armv8_64bit>
+    # TODO: What about 32-bit little in ZynqMP and Versal?
 )

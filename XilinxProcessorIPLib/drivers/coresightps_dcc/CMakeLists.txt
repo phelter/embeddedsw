@@ -2,9 +2,9 @@ add_library(xil_driver_coresightps_ddc STATIC EXCLUDE_FROM_ALL)
 add_library(xil::driver::coresightps_ddc ALIAS xil_driver_coresightps_ddc)
 
 target_sources(xil_driver_coresightps_ddc
-  PUBLIC # Using PUBLIC since relies on xparameters.h
-    src/xcoresightpsddc.c
-    src/xcoresightpsddc.h
+  PRIVATE
+    src/xcoresightpsdcc.c
+    src/xcoresightpsdcc.h
 )
 
 target_include_directories( xil_driver_coresightps_ddc SYSTEM

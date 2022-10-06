@@ -18,9 +18,12 @@ target_sources(xil_bsp_standalone_arm_cortexr5
   $<$<C_COMPILER_ID:IAR>:
     iccarm/asm_vectors.s
     iccarm/boot.s>
-  $<$<BOOL:${XIL_PLATFORM}>:
-    platform/${XIL_PLATFORM}/mpu.c
-    platform/${XIL_PLATFORM}/xparameters_ps.h>
+  $<$<STREQUAL:${XIL_PLATFORM},versal>:
+    platform/versal/mpu.c
+    platform/versal/xparameters_ps.h>
+    $<$<STREQUAL:${XIL_PLATFORM},ZynqMP>:
+    platform/ZynqMP/mpu.c
+    platform/ZynqMP/xparameters_ps.h>
 
     sleep.c
     usleep.c
@@ -40,7 +43,7 @@ target_sources(xil_bsp_standalone_arm_cortexr5
 target_include_directories( xil_bsp_standalone_arm_cortexr5 SYSTEM
   PUBLIC
    .
-   $<$<BOOL:${XIL_PLATFORM}>:platform/${XIL_PLATFORM}>
+   $<$<BOOL:${XIL_PLATFORM}>:${CMAKE_CURRENT_SOURCE_DIR}/platform/${XIL_PLATFORM}>
 )
 
 target_link_libraries( xil_bsp_standalone_arm_cortexr5

@@ -1,40 +1,31 @@
-add_executable(zynq_fsbl EXCLUDE_FROM_ALL)
-add_library(xil::apps::zynq_fsbl ALIAS zynq_fsbl)
+set(ZYNQ_FSBL_PLATFORM_LIST zc702 zc706 zed)
+if (NOT XIL_PLATFORM IN_LIST ZYNQ_FSBL_PLATFORM_LIST)
+    # Not a supported platform for the zynq_fsbl
+    return()
+endif()
 
-target_sources(zynq_fsbl
+# -------------------------------------------------------------------
+add_subdirectory(misc/zc702)
+add_subdirectory(misc/zc706)
+add_subdirectory(misc/zed)
+
+if( TARGET xil::config )
+    #TODO(phelter): Support for external config?
+    message(FATAL_ERROR "xil::config already defined - XIL_PLATFORM=${XIL_PLATFORM}")
+elseif (XIL_PLATFORM STREQUAL "zc702")
+    add_library( xil::config ALIAS xil_config_zc702 )
+elseif (XIL_PLATFORM STREQUAL "zc706")
+    add_library( xil::config ALIAS xil_config_zc706 )
+elseif (XIL_PLATFORM STREQUAL "zed")
+    add_library( xil::config ALIAS xil_config_zed )
+endif()
+
+
+# -------------------------------------------------------------------
+add_executable(zynq_fsbl)
+
+target_sources( zynq_fsbl
   PRIVATE
-  $<$<STREQUAL:${XIL_PLATFORM},zc702>:
-    misc/zc702/bspconfig.h
-    misc/zc702/CMakeLists.txt
-    misc/zc702/drivers.txt
-    misc/zc702/inbyte.c
-    misc/zc702/outbyte.c
-    misc/zc702/ps7_init_gpl.c
-    misc/zc702/ps7_init_gpl.h
-    misc/zc702/ps7_init.c
-    misc/zc702/ps7_init.h
-    misc/zc702/xparameters.h>
-  $<$<STREQUAL:${XIL_PLATFORM},zc706>:
-    misc/zc706/bspconfig.h
-    misc/zc706/drivers.txt
-    misc/zc706/inbyte.c
-    misc/zc706/outbyte.c
-    misc/zc706/ps7_init_gpl.c
-    misc/zc706/ps7_init_gpl.h
-    misc/zc706/ps7_init.c
-    misc/zc706/ps7_init.h
-    misc/zc706/xparameters.h>
-  $<$<STREQUAL:${XIL_PLATFORM},zed>:
-    misc/zed/bspconfig.h
-    misc/zed/drivers.txt
-    misc/zed/inbyte.c
-    misc/zed/outbyte.c
-    misc/zed/ps7_init_gpl.c
-    misc/zed/ps7_init_gpl.h
-    misc/zed/ps7_init.c
-    misc/zed/ps7_init.h
-    misc/zed/xparameters.h>
- 
     src/fsbl_debug.h
     src/fsbl_handoff.S
     src/fsbl_hooks.c
@@ -64,17 +55,32 @@ target_sources(zynq_fsbl
 
 target_include_directories( zynq_fsbl SYSTEM
   PRIVATE
-    $<$<STREQUAL:${XIL_PLATFORM},zc702>:misc/zc702>
-    $<$<STREQUAL:${XIL_PLATFORM},zc706>:misc/zc706>
-    $<$<STREQUAL:${XIL_PLATFORM},zed>:misc/zed>
-    
-   
+    src
 )
 
+target_compile_options( zynq_fsbl
+  PRIVATE
+  $<$<C_COMPILER_ID:Clang,ARMClang>:
+    -Wno-date-time
+    -Wno-gnu-statement-expression
+    -Wno-implicit-int-conversion
+    -Wno-int-to-pointer-cast
+    -Wno-int-to-void-pointer-cast
+    -Wno-missing-noreturn
+    -Wno-missing-prototypes
+    -Wno-missing-variable-declarations
+    -Wno-parentheses-equality
+    -Wno-pointer-to-int-cast
+    -Wno-shadow
+    -Wno-sign-conversion
+    -Wno-strict-prototypes
+    -Wno-unused-macros>
+)
 # TODO Link options for Xilinx.spec
 #target_link_options()
 target_link_libraries( zynq_fsbl
   PRIVATE
+    xil::config
     xil::driver::cpu_cortexa9
     xil::driver::devcfg
     xil::driver::dmaps
@@ -89,4 +95,6 @@ target_link_libraries( zynq_fsbl
     xil::driver::uartps
     xil::driver::usbps
     xil::driver::xadcps
+
+    xil::service::ffs
 )

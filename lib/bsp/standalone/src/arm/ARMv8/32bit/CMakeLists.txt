@@ -26,11 +26,11 @@ target_sources(xil_bsp_standalone_armv8_32bit
       gcc/boot.S
       gcc/cpu_init.S
       gcc/xil-crt0.S>
-    $<$<STREQUAL:${XIL_PLATFORM}:versal>:
-      platform/${XIL_PLATFORM}/xparameters_ps.h>
-    $<$<STREQUAL:${XIL_PLATFORM}:ZynqMP>:
-      platform/${XIL_PLATFORM}/xparameters_ps.h
-      platform/${XIL_PLATFORM}/translation_table.S>
+    $<$<STREQUAL:${XIL_PLATFORM},versal>:
+      platform/versal/xparameters_ps.h>
+    $<$<STREQUAL:${XIL_PLATFORM},ZynqMP>:
+      platform/ZynqMP/xparameters_ps.h
+      platform/ZynqMP/translation_table.S>
 )
 
 # TODO: Add target_compiler_options to allow both 32 and 64bit to compile at same time
@@ -38,8 +38,8 @@ target_sources(xil_bsp_standalone_armv8_32bit
 target_include_directories( xil_bsp_standalone_armv8_32bit SYSTEM
   PUBLIC
    .
-   $<$<IN_LIST:${XIL_PLATFORM}:${XIL_PLATFORM_LIST}>:
-   platform/${XIL_PLATFORM}>
+   $<$<IN_LIST:${XIL_PLATFORM},${XIL_PLATFORM_LIST}>:
+      ${CMAKE_CURRENT_SOURCE_DIR}/platform/${XIL_PLATFORM}>
 )
 
 target_compile_options (xil_bsp_standalone_armv8_32bit

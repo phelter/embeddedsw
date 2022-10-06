@@ -42,16 +42,41 @@ target_sources(xil_bsp_standalone_common
     xstatus.h
 )
 
+target_compile_options( xil_bsp_standalone_common 
+    PUBLIC
+    $<$<C_COMPILER_ID:Clang,ARMClang>:
+        -Wno-cast-align
+        -Wno-cast-qual
+        -Wno-documentation-unknown-command
+        -Wno-documentation
+        -Wno-empty-translation-unit
+        -Wno-newline-eof
+        -Wno-reserved-macro-identifier>
+    PRIVATE
+    $<$<C_COMPILER_ID:Clang,ARMClang>:
+        -Wno-float-conversion
+        -Wno-implicit-fallthrough
+        -Wno-implicit-int-conversion
+        -Wno-implicit-int-float-conversion
+        -Wno-padded
+        -Wno-shorten-64-to-32
+        -Wno-sign-conversion>
+)
+
 target_include_directories( xil_bsp_standalone_common SYSTEM
   PUBLIC
    .
    clocking
    intr
 
-   $<$<STREQUAL:${XIL_PLATFORM},versal>:versal>
+   $<$<STREQUAL:${XIL_PLATFORM},versal>:${CMAKE_CURRENT_SOURCE_DIR}/versal>
 )
 
-# target_link_libraries( xil_bsp_standalone_common
-#   PUBLIC
-#     xil_bsp_standalone_arm_common
-# )
+target_link_libraries( xil_bsp_standalone_common
+  PUBLIC
+    xil::config
+    $<$<IN_LIST:${XIL_PLATFORM},${XIL_PLATFORM_ZYNQ_LIST}>:xil::bsp::standalone_arm_cortexa9>
+    $<$<IN_LIST:${XIL_PLATFORM},${XIL_PLATFORM_ZYNQMP_LIST}>:xil::bsp::standalone_armv8_64bit>
+    $<$<IN_LIST:${XIL_PLATFORM},${XIL_PLATFORM_VERSAL_LIST}>:xil::bsp::standalone_armv8_64bit>
+    #$<$<IN_LIST:${XIL_PLATFORM},${XIL_PLATFORM_VERSAL_LIST}>:xil::bsp::standalone_armv8_32bit>    
+)

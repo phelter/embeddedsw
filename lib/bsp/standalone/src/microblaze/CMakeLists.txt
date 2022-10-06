@@ -56,7 +56,7 @@ target_sources(xil_bsp_standalone_microblaze
 target_include_directories( xil_bsp_standalone_microblaze SYSTEM
   PUBLIC
    .
-   #$<$<C_COMPILER_ID:ARMCC>:armcc>
+   #$<$<C_COMPILER_ID:ARMCC>:${CMAKE_CURRENT_SOURCE_DIR}/armcc>
 )
 
 target_link_libraries( xil_bsp_standalone_microblaze

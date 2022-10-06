@@ -2,7 +2,7 @@ add_library(xil_driver_uartps STATIC EXCLUDE_FROM_ALL)
 add_library(xil::driver::uartps ALIAS xil_driver_uartps)
 
 target_sources(xil_driver_uartps
-  PUBLIC # Using PUBLIC since relies on xparameters.h
+  PRIVATE
     src/xuartps_g.c
     src/xuartps_hw.c
     src/xuartps_hw.h
@@ -17,6 +17,14 @@ target_sources(xil_driver_uartps
 target_include_directories( xil_driver_uartps SYSTEM
   PUBLIC
    src
+)
+
+target_compile_options(xil_driver_uartps
+  PRIVATE
+  $<$<C_COMPILER_ID:Clang,ARMClang>:
+    -Wno-implicit-int-conversion
+    -Wno-missing-variable-declarations
+    -Wno-padded>
 )
 
 target_link_libraries( xil_driver_uartps

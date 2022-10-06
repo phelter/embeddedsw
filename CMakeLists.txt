@@ -35,7 +35,7 @@ project(xilinx-embeddedsw VERSION 0.1.0 LANGUAGES C)
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
-set(XIL_PROCESSOR "" CACHE "Xilinx FPGA SoC Processor type")
+set(XIL_PROCESSOR "" CACHE STRING "Xilinx FPGA SoC Processor type")
 set(XIL_PROCESSOR_ARM_LIST
   ARMV8 # Arm ARMv8 32-bit processor
   CORTEXA9 # Arm CortexA9 processr
@@ -47,13 +47,17 @@ list(APPEND XIL_PROCESSOR_LIST
 )
 
 
-set(XIL_PLATFORM "ZynqMP" CACHE "Xilinx FPGA SoC Platform type")
-set(XIL_PLATFORM_ZYNQ_LIST )
-set(XIL_PLATFORM_ZYNQMP_LIST )
-set(XIL_PLATFORM_VERSAL_LIST )
+set(XIL_PLATFORM "zc706" CACHE STRING "Xilinx FPGA SoC Platform type")
+set(XIL_PLATFORM_ZYNQ_LIST zc702 zc706 zed)
+set(XIL_PLATFORM_ZYNQMP_LIST ZynqMP zc102 zc102-es2)
+set(XIL_PLATFORM_VERSAL_LIST versal)
 set(XIL_PLATFORM_LIST
-  versal # Versal platform - ARMV8 only?
-  ZynqMP # ZynqMP Platform - ARMV8 only?
+  versal # Versal platform - ARMV8 - assuming 64-bit
+  ZynqMP # ZynqMP Platform - ARMV8 - assuming 64-bit
+  zc702  # Zynq 702
+  zc706  # Zynq 706
+  zed    # Zynq Zed platform
+  som    # TBD
 )
 
 if(XIL_PLATFORM AND NOT ( XIL_PLATFORM IN_LIST XIL_PLATFORM_LIST ) )
@@ -80,11 +84,11 @@ add_compile_options(
     $<$<C_COMPILER_ID:GNU>:-fdiagnostics-color=always>
     $<$<C_COMPILER_ID:ARMClang,Clang>:-fcolor-diagnostics>
 
-    $<$<C_COMPILER_ID:ARMClang,ARMClang,GNU>:-Wall>
-    $<$<C_COMPILER_ID:ARMClang,ARMClang,GNU>:-Wextra>
-    $<$<C_COMPILER_ID:ARMClang,ARMClang,GNU>:-Wpedantic>
-    $<$<C_COMPILER_ID:ARMClang,ARMClang,GNU>:-Werror>
-    $<$<C_COMPILER_ID:ARMClang,ARMClang>:-Weverything>
+    $<$<C_COMPILER_ID:ARMClang,Clang,GNU>:-Wall>
+    $<$<C_COMPILER_ID:ARMClang,Clang,GNU>:-Wextra>
+    $<$<C_COMPILER_ID:ARMClang,Clang,GNU>:-Wpedantic>
+    $<$<C_COMPILER_ID:ARMClang,Clang,GNU>:-Werror>
+    $<$<C_COMPILER_ID:ARMClang,Clang>:-Weverything>
 
     # Documentation types
     # $<$<C_COMPILER_ID:Clang>:-fcomment-block-commands=retval> # Doesn't recongize doxygen retval
@@ -94,9 +98,10 @@ add_compile_options(
 )
 
 # -----------------------------------------------------------------------------
-add_subdirectory(lib/bsp/src)
-add_subdirectory(sw_apps)
-add_subdirectory(XilinxProcessorPLib/drivers)
+add_subdirectory(lib/bsp/standalone/src)
+add_subdirectory(lib/sw_apps)
+add_subdirectory(lib/sw_services)
+add_subdirectory(XilinxProcessorIPLib/drivers)
 
 ########################################################################
 # Install rules

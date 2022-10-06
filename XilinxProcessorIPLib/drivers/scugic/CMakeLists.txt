@@ -2,7 +2,7 @@ add_library(xil_driver_scugic STATIC EXCLUDE_FROM_ALL)
 add_library(xil::driver::scugic ALIAS xil_driver_scugic)
 
 target_sources(xil_driver_scugic
-  PUBLIC # Using PUBLIC since relies on xparameters.h
+  PRIVATE
     src/xscugic_g.c
     src/xscugic_hw.c
     src/xscugic_hw.h
@@ -16,6 +16,14 @@ target_sources(xil_driver_scugic
 target_include_directories( xil_driver_scugic SYSTEM
   PUBLIC
    src
+)
+
+target_compile_options( xil_driver_scugic
+  PRIVATE
+  $<$<C_COMPILER_ID:ARMClang,Clang>:
+    -Wno-implicit-int-conversion
+    -Wno-padded
+    -Wno-parentheses-equality>
 )
 
 target_link_libraries( xil_driver_scugic
